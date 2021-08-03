@@ -6,16 +6,17 @@ using System.Threading;
 using Persistence;
 using Microsoft.EntityFrameworkCore;
 using System;
+using Application.Core;
 
 namespace Application.Activities
 {
     public class Details
     {
-        public class Query : IRequest<Activity>{
+        public class Query : IRequest<Result<Activity>>{
              public Guid Id { get; set; }
         }
 
-        public class Handler : IRequestHandler<Query, Activity>
+        public class Handler : IRequestHandler<Query, Result<Activity>>
         {
             private readonly DataContext _context;
             public Handler(DataContext context)
@@ -23,8 +24,9 @@ namespace Application.Activities
                 _context = context; 
             }
 
-            public async Task<Activity> Handle(Query query, CancellationToken cancellationToken){
-                return await _context.Activties.FindAsync(query.Id);
+            public async Task<Result<Activity>> Handle(Query query, CancellationToken cancellationToken){
+                var activity =  await _context.Activties.FindAsync(query.Id);
+                return Result<Activity>.Success(activity);
             }
         }
 
