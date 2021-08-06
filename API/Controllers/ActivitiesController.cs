@@ -2,12 +2,12 @@ using Persistence;
 using Domain;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
 using System;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 namespace API.Controllers
 {
+    [AllowAnonymous]
     public class ActivitiesController : BaseApiController
     {
         [HttpGet]
