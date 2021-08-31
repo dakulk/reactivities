@@ -9,7 +9,6 @@ using System;
 using Application.Core;
 using AutoMapper.QueryableExtensions;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.Activities
 {
