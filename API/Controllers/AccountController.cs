@@ -7,6 +7,7 @@ using API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using System.Linq;
 
 namespace API.Controllers
 {
@@ -27,7 +28,7 @@ namespace API.Controllers
 
         [HttpPost("login")]
         public async Task<ActionResult<UserDto>> Login(LoginDto loginDto){
-            var user = await _userManager.FindByEmailAsync(loginDto.Email);
+            var user = await _userManager.Users.Include(x => x.Photos).FirstOrDefaultAsync(x => x.Email == loginDto.Email);
             if (user == null) return Unauthorized();
             var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
             if (result.Succeeded){
@@ -64,14 +65,14 @@ namespace API.Controllers
         [Authorize]
         [HttpGet]
         public async Task<ActionResult<UserDto>> GetCurrentUser(){
-            var user = await _userManager.FindByEmailAsync(User.FindFirstValue(ClaimTypes.Email));
+            var user = await _userManager.Users.Include(x => x.Photos).FirstOrDefaultAsync(x => x.Email == User.FindFirstValue(ClaimTypes.Email));
             return CreateUserObject(user);
         }
 
         private UserDto CreateUserObject(AppUser user){
             return new UserDto{
                     DisplayName = user.DisplayName,
-                    Image = null,
+                    Image = user.Photos?.FirstOrDefault(x => x.IsMain)?.Url,
                     Token = _tokenService.CreateToken(user),
                     Username = user.UserName
                 };
